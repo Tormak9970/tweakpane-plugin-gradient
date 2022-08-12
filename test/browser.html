@@ -6,19 +6,23 @@
 </head>
 <body>
 	<script src="../node_modules/tweakpane/dist/tweakpane.js"></script>
-	<script src="../dist/tweakpane-plugin-template.js"></script>
+	<script src="../dist/tweakpane-plugin-gradient.js"></script>
 	<script>
-		const params = {
-			prop: 3,
-		};
 		const pane = new Tweakpane.Pane();
-
 		// Register plugin
-		pane.registerPlugin(TweakpaneTemplatePlugin);
+		pane.registerPlugin(TweakpaneGradientPlugin);
 
-		// TODO: Update parameters for your plugin
-		pane.addInput(params, 'prop', {
-			view: 'dots',
+		const params = {
+			'Gradient': [
+				{ color: '#000000', stop: 0 },
+				{ color: '#ffffff', stop: 1 },
+			],
+		};
+
+		pane.addInput(params, 'Gradient', {
+			'min': 1,
+			'max': 10,
+			'format': TweakpaneGradientPlugin.COLOR_SPACES.RGB
 		}).on('change', (ev) => {
 			console.log(ev.value);
 		});

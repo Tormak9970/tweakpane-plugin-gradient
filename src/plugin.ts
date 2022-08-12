@@ -3,7 +3,6 @@ import {
 	BindingTarget,
 	CompositeConstraint,
 	createRangeConstraint,
-	createStepConstraint,
 	InputBindingPlugin,
 	ParamsParsers,
 	parseParams,
@@ -11,11 +10,20 @@ import {
 
 import {PluginController} from './controller';
 
+export enum COLOR_SPACES {
+	RGB='rgb',
+	HSV='hsv',
+	HEX='hex',
+}
+
+function isGradientStopArr(params: GradientStop[] | any): params is GradientStop[] {
+	return (params as GradientStop[]).every((grad) => grad.stop !== undefined && (((grad.color as ColorRGB).r !== undefined && (grad.color as ColorRGB).g !== undefined && (grad.color as ColorRGB).b !== undefined) || ((grad.color as ColorHSV).h !== undefined && (grad.color as ColorHSV).s !== undefined && (grad.color as ColorHSV).v !== undefined) || typeof grad.color === 'string'));
+}
+
 export interface PluginInputParams extends BaseInputParams {
 	max?: number;
 	min?: number;
-	step?: number;
-	view: 'dots';
+	colorSpace: COLOR_SPACES;
 }
 
 // NOTE: You can see JSDoc comments of `InputBindingPlugin` for details about each property
@@ -25,16 +33,14 @@ export interface PluginInputParams extends BaseInputParams {
 // - converts `Ex` into `In` and holds it
 // - P is the type of the parsed parameters
 //
-export const TemplateInputPlugin: InputBindingPlugin<
-	number,
-	number,
+
+export const GradientGeneratorPlugin: InputBindingPlugin<
+	GradientStop[],
+	GradientStop[],
 	PluginInputParams
 > = {
-	id: 'input-template',
-
-	// type: The plugin type.
-	// - 'input': Input binding
-	// - 'monitor': Monitor binding
+	id: 'gradient',
+	// type: The plugin type. (input or monitor)
 	type: 'input',
 
 	// This plugin template injects a compiled CSS by @rollup/plugin-replace
@@ -42,7 +48,7 @@ export const TemplateInputPlugin: InputBindingPlugin<
 	css: '__css__',
 
 	accept(exValue: unknown, params: Record<string, unknown>) {
-		if (typeof exValue !== 'number') {
+		if (!isGradientStopArr(exValue) && (exValue as GradientStop[])?.length > 0) {
 			// Return null to deny the user input
 			return null;
 		}
@@ -50,12 +56,16 @@ export const TemplateInputPlugin: InputBindingPlugin<
 		// Parse parameters object
 		const p = ParamsParsers;
 		const result = parseParams<PluginInputParams>(params, {
-			// `view` option may be useful to provide a custom control for primitive values
-			view: p.required.constant('dots'),
+			colorSpace: p.optional.custom((value:unknown) => {
+				// @ts-ignore
+				if (Object.values(COLOR_SPACES).includes(value)) {
+					return value as COLOR_SPACES;
+				}
+				return COLOR_SPACES.RGB
+			}),
 
 			max: p.optional.number,
 			min: p.optional.number,
-			step: p.optional.number,
 		});
 		if (!result) {
 			return null;
@@ -63,34 +73,32 @@ export const TemplateInputPlugin: InputBindingPlugin<
 
 		// Return a typed value and params to accept the user input
 		return {
-			initialValue: exValue,
+			initialValue: exValue as GradientStop[],
 			params: result,
 		};
 	},
 
 	binding: {
 		reader(_args) {
-			return (exValue: unknown): number => {
+			return (exValue: unknown): GradientStop[] => {
 				// Convert an external unknown value into the internal value
-				return typeof exValue === 'number' ? exValue : 0;
+				return isGradientStopArr(exValue) ? exValue as GradientStop[] : [
+					{ color: '#000000', stop: 0.0 },
+					{ color: '#ffffff', stop: 1.0 },
+				];
 			};
 		},
 
-		constraint(args) {
-			// Create a value constraint from the user input
-			const constraints = [];
-			// You can reuse existing functions of the default plugins
-			const cr = createRangeConstraint(args.params);
-			if (cr) {
-				constraints.push(cr);
-			}
-			const cs = createStepConstraint(args.params);
-			if (cs) {
-				constraints.push(cs);
-			}
-			// Use `CompositeConstraint` to combine multiple constraints
-			return new CompositeConstraint(constraints);
-		},
+		// constraint(args) {
+		// 	// Create a value constraint from the user input
+		// 	const constraints = [];
+		// 	// You can reuse existing functions of the default plugins
+		// 	const cr = createRangeConstraint(args.params);
+		// 	if (cr) {
+		// 		constraints.push(cr);
+		// 	}
+		// 	return new CompositeConstraint(constraints);
+		// },
 
 		writer(_args) {
 			return (target: BindingTarget, inValue) => {

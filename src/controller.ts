@@ -10,13 +10,13 @@ import {
 import {PluginView} from './view';
 
 interface Config {
-	value: Value<number>;
+	value: Value<GradientStop[]>;
 	viewProps: ViewProps;
 }
 
 // Custom controller class should implement `Controller` interface
 export class PluginController implements Controller<PluginView> {
-	public readonly value: Value<number>;
+	public readonly value: Value<GradientStop[]>;
 	public readonly view: PluginView;
 	public readonly viewProps: ViewProps;
 
@@ -52,10 +52,6 @@ export class PluginController implements Controller<PluginView> {
 			return;
 		}
 
-		// Update the value by user input
-		const dx =
-			constrainRange(data.point.x / data.bounds.width + 0.05, 0, 1) * 10;
-		const dy = data.point.y / 10;
-		this.value.rawValue = Math.floor(dy) * 10 + dx;
+		this.value.rawValue = [];
 	}
 }

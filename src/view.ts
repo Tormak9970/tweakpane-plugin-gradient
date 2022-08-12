@@ -1,20 +1,19 @@
 import {ClassName, mapRange, Value, View, ViewProps} from '@tweakpane/core';
 
 interface Config {
-	value: Value<number>;
+	value: Value<GradientStop[]>;
 	viewProps: ViewProps;
 }
 
 // Create a class name generator from the view name
 // ClassName('tmp') will generate a CSS class name like `tp-tmpv`
-const className = ClassName('tmp');
+const className = ClassName('gradient');
 
 // Custom view class should implement `View` interface
 export class PluginView implements View {
 	public readonly element: HTMLElement;
-	private value_: Value<number>;
-	private dotElems_: HTMLElement[] = [];
-	private textElem_: HTMLElement;
+	private _value: Value<GradientStop[]>;
+	private _canvas: HTMLCanvasElement;
 
 	constructor(doc: Document, config: Config) {
 		// Create a root element for the plugin
@@ -24,17 +23,23 @@ export class PluginView implements View {
 		config.viewProps.bindClassModifiers(this.element);
 
 		// Receive the bound value from the controller
-		this.value_ = config.value;
+		this._value = config.value;
 		// Handle 'change' event of the value
-		this.value_.emitter.on('change', this.onValueChange_.bind(this));
+		this._value.emitter.on('change', this._onValueChange.bind(this));
 
 		// Create child elements
-		this.textElem_ = doc.createElement('div');
-		this.textElem_.classList.add(className('text'));
-		this.element.appendChild(this.textElem_);
+		const canvasCont = doc.createElement('div');
+		canvasCont.classList.add(className('canvas_cont'));
+
+		this._canvas = doc.createElement('canvas');
+		this._canvas.height = 20;
+		this._canvas.width = 140;
+		this._canvas.classList.add(className('canvas'));
+		canvasCont.appendChild(this._canvas);
+		this.element.appendChild(canvasCont);
 
 		// Apply the initial value
-		this.refresh_();
+		this._refresh();
 
 		config.viewProps.handleDispose(() => {
 			// Called when the view is disposing
@@ -42,39 +47,23 @@ export class PluginView implements View {
 		});
 	}
 
-	private refresh_(): void {
-		const rawValue = this.value_.rawValue;
+	private _refresh(): void {
+		const rawValue = this._value.rawValue;
 
-		this.textElem_.textContent = rawValue.toFixed(2);
+		const ctx = <CanvasRenderingContext2D>this._canvas.getContext("2d");
+		const gradient = ctx.createLinearGradient(0, 0, 140, 0);
 
-		while (this.dotElems_.length > 0) {
-			const elem = this.dotElems_.shift();
-			if (elem) {
-				this.element.removeChild(elem);
-			}
+		for (let i = 0; i < rawValue.length; i++) {
+			const stop = rawValue[i];
+
+			gradient.addColorStop(stop.stop, (typeof stop.color == 'string' ? stop.color : ((stop.color as ColorRGB).r !== undefined ? `rgb(${(stop.color as ColorRGB).r}, ${(stop.color as ColorRGB).g}, ${(stop.color as ColorRGB).b})` : `hsv(${(stop.color as ColorHSV).h}, ${(stop.color as ColorHSV).s}, ${(stop.color as ColorHSV).v})`)));
 		}
 
-		const doc = this.element.ownerDocument;
-		const dotCount = Math.floor(rawValue);
-		for (let i = 0; i < dotCount; i++) {
-			const dotElem = doc.createElement('div');
-			dotElem.classList.add(className('dot'));
-
-			if (i === dotCount - 1) {
-				const fracElem = doc.createElement('div');
-				fracElem.classList.add(className('frac'));
-				const frac = rawValue - Math.floor(rawValue);
-				fracElem.style.width = `${frac * 100}%`;
-				fracElem.style.opacity = String(mapRange(frac, 0, 1, 1, 0.2));
-				dotElem.appendChild(fracElem);
-			}
-
-			this.dotElems_.push(dotElem);
-			this.element.appendChild(dotElem);
-		}
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, 140, 20);
 	}
 
-	private onValueChange_() {
-		this.refresh_();
+	private _onValueChange() {
+		this._refresh();
 	}
 }
