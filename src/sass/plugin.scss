@@ -6,30 +6,107 @@
 	// Extend a general input view style
 	@extend %input;
 
-	cursor: pointer;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: flex-start;
-	height: calc(var(--bld-us) * 3);
+	height: calc(var(--bld-us) * 5);
 	overflow: hidden;
 	position: relative;
+	
+	background-color: var(--bs-bg) !important;
 
 	&.#{$prefix}-v-disabled {
 		opacity: 0.5;
 	}
 
+	&_ar_cont {
+		width: 154px;
+		height: 20px;
+
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-start;
+
+		margin-bottom: 3px;
+	}
+	&_edit_stops {
+		cursor: pointer;
+		background-color: var(--bs-bg);
+
+		&:hover { background-color: var(--cnt-bg-h); }
+		&:active { background-color: var(--cnt-bg-a); }
+		&:focus { background-color: var(--cnt-bg-f); }
+
+		width: 30px;
+		height: 20px;
+
+		border-radius: 4px;
+
+		margin-right: 7px;
+
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+
+		& > svg {
+			height: 15px;
+			fill: var(--lbl-fg);
+		}
+	}
+
+
 	&_canvas_cont {
-		background-color: var(--in-bg);
+		background-color: var(--cnt-bg-a);
 		
-		width: 140px;
+		width: 150px;
 		height: 20px;
 
 		padding: 2px;
 		border-radius: 2px;
-		border: 1px solid var(--in-fg)
+		
+		margin-bottom: 7px;
 	}
-	&_canvas {
+	&_canvas {}
 
+
+	&_ctrl_cont {
+		width: 154px;
+		height: 20px;
+
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+
+		margin-bottom: 7px;
+	}
+	&_cycle_idx {
+		cursor: pointer;
+		background-color: var(--cnt-bg);
+
+		&:hover { background-color: var(--cnt-bg-h); }
+		&:active { background-color: var(--cnt-bg-a); }
+		&:focus { background-color: var(--cnt-bg-f); }
+
+		width: 45px;
+		height: 20px;
+
+		border-radius: 4px;
+	}
+	&_set_pos {
+		cursor: pointer;
+		background-color: var(--cnt-bg);
+
+		&:hover { background-color: var(--cnt-bg-h); }
+		&:active { background-color: var(--cnt-bg-a); }
+		&:focus { background-color: var(--cnt-bg-f); }
+
+		width: 95px;
+		height: 20px;
+
+		border-radius: 4px;
 	}
 }

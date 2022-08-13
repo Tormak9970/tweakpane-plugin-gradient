@@ -1,8 +1,6 @@
 import {
 	BaseInputParams,
 	BindingTarget,
-	CompositeConstraint,
-	createRangeConstraint,
 	InputBindingPlugin,
 	ParamsParsers,
 	parseParams,
@@ -21,18 +19,8 @@ function isGradientStopArr(params: GradientStop[] | any): params is GradientStop
 }
 
 export interface PluginInputParams extends BaseInputParams {
-	max?: number;
-	min?: number;
 	colorSpace: COLOR_SPACES;
 }
-
-// NOTE: You can see JSDoc comments of `InputBindingPlugin` for details about each property
-//
-// `InputBindingPlugin<In, Ex, P>` means...
-// - The plugin receives the bound value as `Ex`,
-// - converts `Ex` into `In` and holds it
-// - P is the type of the parsed parameters
-//
 
 export const GradientGeneratorPlugin: InputBindingPlugin<
 	GradientStop[],
@@ -40,11 +28,7 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 	PluginInputParams
 > = {
 	id: 'gradient',
-	// type: The plugin type. (input or monitor)
 	type: 'input',
-
-	// This plugin template injects a compiled CSS by @rollup/plugin-replace
-	// See rollup.config.js for details
 	css: '__css__',
 
 	accept(exValue: unknown, params: Record<string, unknown>) {
@@ -62,10 +46,7 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 					return value as COLOR_SPACES;
 				}
 				return COLOR_SPACES.RGB
-			}),
-
-			max: p.optional.number,
-			min: p.optional.number,
+			})
 		});
 		if (!result) {
 			return null;
@@ -89,17 +70,6 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 			};
 		},
 
-		// constraint(args) {
-		// 	// Create a value constraint from the user input
-		// 	const constraints = [];
-		// 	// You can reuse existing functions of the default plugins
-		// 	const cr = createRangeConstraint(args.params);
-		// 	if (cr) {
-		// 		constraints.push(cr);
-		// 	}
-		// 	return new CompositeConstraint(constraints);
-		// },
-
 		writer(_args) {
 			return (target: BindingTarget, inValue) => {
 				// Use `target.write()` to write the primitive value to the target,
@@ -110,7 +80,6 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 	},
 
 	controller(args) {
-		// Create a controller for the plugin
 		return new PluginController(args.document, {
 			value: args.value,
 			viewProps: args.viewProps,

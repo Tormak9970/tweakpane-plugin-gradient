@@ -28,17 +28,16 @@ pane.registerPlugin(TweakpaneGradientPlugin);
 
 ## Usage
 ```js
+pane.registerPlugin(TweakpaneGradientPlugin);
+
 const params = {
   'Gradient': [
-    { color: '#000000', stop: 0 },
-    { color: '#ffffff', stop: 1 },
+    { color: '#32a852', stop: 0 },
+    { color: '#3246a8', stop: 1 },
   ],
 };
 
-// TODO: Update parameters for your plugin
 pane.addInput(params, 'Gradient', {
-  'min': 1,
-  'max': 10,
   'format': TweakpaneGradientPlugin.COLOR_SPACES.RGB
 }).on('change', (ev) => {
   console.log(ev.value);
