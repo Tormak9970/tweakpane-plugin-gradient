@@ -12,6 +12,7 @@ export class PopupController implements Controller<PopupView> {
 	public readonly viewProps: ViewProps;
 
 	constructor(doc: Document, config: Config) {
+		console.log(this.shows)
 		this.viewProps = config.viewProps;
 		this.view = new PopupView(doc, {
 			shows: this.shows,
