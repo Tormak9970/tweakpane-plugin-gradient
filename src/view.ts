@@ -1,4 +1,4 @@
-import {ClassName, mapRange, Value, View, ViewProps} from '@tweakpane/core';
+import {ClassName, Value, View, ViewProps} from '@tweakpane/core';
 
 interface Config {
 	value: Value<GradientStop[]>;
@@ -21,7 +21,8 @@ export class PluginView implements View {
 	private _cycleIdx: HTMLElement;
 	private _setPos: HTMLElement;
 
-	private _stopColor: HTMLInputElement
+	colorButton: HTMLDivElement;
+	// private _stopColor: HTMLInputElement;
 
 	constructor(doc: Document, config: Config) {
 		// Create a root element for the plugin
@@ -82,6 +83,23 @@ export class PluginView implements View {
 			ctrlCont.appendChild(this._setPos);
 
 			this.element.appendChild(ctrlCont);
+		}
+
+		{
+			const colCont = doc.createElement('div');
+			colCont.classList.add(className('col_cont'));
+
+			this.colorButton = doc.createElement('div');
+			this.colorButton.classList.add(className('stop_color_view'));
+			colCont.appendChild(this.colorButton);
+
+			// this._stopColor = doc.createElement('input');
+			// this._stopColor.type = "color";
+			// this._stopColor.classList.add(className('stop_color_input'));
+			// this._stopColor.addEventListener('input', this._setStopColor);
+			// colCont.appendChild(this._stopColor);
+
+			this.element.appendChild(colCont);
 		}
 
 		// Apply the initial value

@@ -9,17 +9,27 @@
 	<script src="../dist/tweakpane-plugin-gradient.js"></script>
 	<script>
 		const pane = new Tweakpane.Pane();
-		// Register plugin
-		pane.registerPlugin(TweakpaneGradientPlugin);
+
+		const propsFolder = pane.addFolder({
+			title: "Test",
+			expanded: true,
+		});
 
 		const params = {
+			'Color': '#000000',
 			'Gradient': [
 				{ color: '#32a852', stop: 0 },
 				{ color: '#3246a8', stop: 1 },
 			],
 		};
 
-		pane.addInput(params, 'Gradient', {
+		propsFolder.addInput(params, 'Color').on('change', (ev) => {
+			console.log(ev.value);
+		});
+
+		// Register plugin
+		pane.registerPlugin(TweakpaneGradientPlugin);
+		propsFolder.addInput(params, 'Gradient', {
 			'format': TweakpaneGradientPlugin.COLOR_SPACES.RGB
 		}).on('change', (ev) => {
 			console.log(ev.value);
