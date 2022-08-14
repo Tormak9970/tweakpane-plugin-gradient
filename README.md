@@ -38,7 +38,7 @@ const params = {
 };
 
 pane.addInput(params, 'Gradient', {
-  'format': TweakpaneGradientPlugin.COLOR_SPACES.RGB
+  'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.RGB
 }).on('change', (ev) => {
   console.log(ev.value);
 });

@@ -1,7 +1,8 @@
-import {ClassName, createValue, Value, View, ViewProps} from '@tweakpane/core';
+import {ClassName, Color, createValue, Value, View, ViewProps} from '@tweakpane/core';
 
 interface Config {
 	value: Value<GradientStop[]>;
+	colBtnCol:Color;
 	viewProps: ViewProps;
 }
 
@@ -25,6 +26,7 @@ export class PluginView implements View {
 	setPos: HTMLElement;
 
 	colorButton: HTMLDivElement;
+	colBtnCol:Color;
 
 	stopIdx:Value<number> = createValue<number>(0);
 
@@ -37,8 +39,10 @@ export class PluginView implements View {
 
 		// Receive the bound value from the controller
 		this._value = config.value;
+		this.colBtnCol = config.colBtnCol;
 		// Handle 'change' event of the value
 		this._value.emitter.on('change', this._onValueChange.bind(this));
+		this.stopIdx.emitter.on('change', this._onValueChange.bind(this));
 
 		// Create child elements
 		{
@@ -131,6 +135,9 @@ export class PluginView implements View {
 
 	private _refresh(): void {
 		this._idxDisp.innerText = this.stopIdx.rawValue.toString();
+
+		const color = this.colBtnCol.getComponents(this.colBtnCol.mode, 'int');
+		this.colorButton.style.backgroundColor = `${this.colBtnCol.mode == 'rgb' ? 'rgb' : (this.colBtnCol.mode == 'hsv' ? 'hsv' : 'hsl')}(${color[0]}, ${color[1]}, ${color[2]})`
 		const rawValue = this._value.rawValue;
 
 		const ctx = <CanvasRenderingContext2D>this._canvas.getContext("2d");

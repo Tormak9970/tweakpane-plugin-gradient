@@ -83,6 +83,7 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 		return new PluginController(args.document, {
 			value: args.value,
 			viewProps: args.viewProps,
+			colorSpace: args.params.colorSpace
 		});
 	},
 };

@@ -1,5 +1,6 @@
 import {
 	Color,
+	colorToHexRgbString,
 	connectValues,
 	Controller,
 	createNumberFormatter,
@@ -18,12 +19,20 @@ import {
 } from '@tweakpane/core';
 import { ColorPickerController } from './colorPicker/controllers/colorPickerController';
 import { PopupController } from './colorPicker/controllers/PopupController';
+import { hexToRGB, rgbToHex } from './utils';
 
 import {PluginView} from './view';
+
+enum COLOR_SPACES {
+	RGB='rgb',
+	HSV='hsv',
+	HEX='hex',
+}
 
 interface Config {
 	value: Value<GradientStop[]>;
 	expanded?: boolean,
+	colorSpace:COLOR_SPACES,
 	viewProps: ViewProps;
 }
 
@@ -42,7 +51,11 @@ export class PluginController implements Controller<PluginView> {
 	private _curStopPos:Value<number> = createValue<number>(0);
 	private _curStopCol:Value<Color> = createValue<Color>(new Color([0, 0, 0], 'rgb'));
 
+	private _colorSpace:COLOR_SPACES;
+
 	constructor(doc: Document, config: Config) {
+		this._colorSpace = config.colorSpace;
+
 		this._onButtonBlur = this._onButtonBlur.bind(this);
 		this._onButtonClick = this._onButtonClick.bind(this);
 		this._onPopupChildBlur = this._onPopupChildBlur.bind(this);
@@ -56,6 +69,8 @@ export class PluginController implements Controller<PluginView> {
 
 		// Receive the bound value from the plugin
 		this.value = config.value;
+		this._curStopPos.setRawValue(this.value.rawValue[0].stop);
+		this._curStopCol.setRawValue(this._gradientColToTweakCol(this.value.rawValue[0].color));
 
 		// and also view props
 		this.viewProps = config.viewProps;
@@ -63,7 +78,7 @@ export class PluginController implements Controller<PluginView> {
 		this._foldable = Foldable.create(config.expanded ? config.expanded : false);
 
 		// Create a custom view
-		this.view = new PluginView(doc, { value: this.value, viewProps: this.viewProps, });
+		this.view = new PluginView(doc, { value: this.value, colBtnCol: this._curStopCol.rawValue, viewProps: this.viewProps, });
 		const buttonElem = this.view.colorButton;
 		buttonElem.addEventListener('blur', this._onButtonBlur);
 		buttonElem.addEventListener('click', this._onButtonClick);
@@ -132,6 +147,12 @@ export class PluginController implements Controller<PluginView> {
 			forward: (p) => p.rawValue,
 			backward: (_, s) => s.rawValue,
 		});
+		connectValues({
+			primary: this._curStopCol,
+			secondary: this.colorPickerC.value,
+			forward: (p) => p.rawValue,
+			backward: (_, s) => s.rawValue,
+		});
 		this._curStopCol.emitter.on('change', this._setStopColor);
 
 		this.viewProps.handleDispose(() => {
@@ -153,11 +174,55 @@ export class PluginController implements Controller<PluginView> {
 	}
 
 	private _cycleStopIdx(dir:boolean) {
-		console.log(dir ? this._stopIdx.rawValue + 1 < this.value.rawValue.length : this._stopIdx.rawValue - 1 >= 0)
-		if (dir ? this._stopIdx.rawValue + 1 < this.value.rawValue.length : this._stopIdx.rawValue - 1 > 0) {
-			this._stopIdx.setRawValue(dir ? this._stopIdx.rawValue + 1 : this._stopIdx.rawValue - 1);
+		if (dir ? this._stopIdx.rawValue + 1 < this.value.rawValue.length : this._stopIdx.rawValue - 1 >= 0) {
+			const newIdx = dir ? this._stopIdx.rawValue + 1 : this._stopIdx.rawValue - 1;
+			this._stopIdx.setRawValue(newIdx);
+			this._curStopPos.setRawValue(this.value.rawValue[newIdx].stop);
+
+			const curVal = this.value.rawValue[newIdx];
+			this._curStopCol.setRawValue(this._gradientColToTweakCol(curVal.color));
 		}
-		console.log(this._stopIdx.rawValue)
+	}
+
+	private _tweakColToGradientCol(curVal: Color): ColorRGB | ColorHSV | string {
+		switch (this._colorSpace) {
+			case COLOR_SPACES.RGB: {
+				const comps = curVal.getComponents('rgb', 'int');
+				return {
+					r: comps[0],
+					g: comps[1],
+					b: comps[2]
+				}
+			}
+			case COLOR_SPACES.HSV: {
+				const comps = curVal.getComponents('hsv', 'int');
+				return {
+					h: comps[0],
+					s: comps[1],
+					v: comps[2]
+				}
+			}
+			case COLOR_SPACES.HEX: {
+				return rgbToHex(curVal.getComponents('rgb', 'int'));
+			}
+		}
+	}
+	private _gradientColToTweakCol(curVal: ColorRGB | ColorHSV | string): Color {
+		console.log(this._colorSpace)
+		switch (this._colorSpace) {
+			case COLOR_SPACES.RGB: {
+				let c = curVal as ColorRGB;
+				return new Color([c.r, c.g, c.b], 'rgb');
+			}
+			case COLOR_SPACES.HSV: {
+				let c = curVal as ColorHSV;
+				return new Color([c.h, c.s, c.v], 'hsv');
+			}
+			case COLOR_SPACES.HEX: {
+				let c = hexToRGB(curVal as string);
+				return new Color([c.r, c.g, c.b], 'rgb');
+			}
+		}
 	}
 
 	private _addStop(e:Event) {
@@ -176,7 +241,13 @@ export class PluginController implements Controller<PluginView> {
 		this.value.setRawValue(newVal);
 	}
 	private _setStopColor(e: { rawValue: Color; }) {
-
+		let newVal = [...this.value.rawValue];
+		const curVal = newVal[this._stopIdx.rawValue];
+		newVal[this._stopIdx.rawValue] = {
+			color: this._tweakColToGradientCol(e.rawValue),
+			stop: curVal.stop
+		}
+		this.value.setRawValue(newVal);
 	}
 
 	private _onButtonBlur(e: FocusEvent) {
