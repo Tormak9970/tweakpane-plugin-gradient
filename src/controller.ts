@@ -1,7 +1,5 @@
 import {
 	Color,
-	ColorController,
-	colorToRgbNumber,
 	connectValues,
 	Controller,
 	createValue,
@@ -10,12 +8,12 @@ import {
 	forceCast,
 	PointerHandler,
 	PointerHandlerEvent,
-	PopupController,
 	supportsTouch,
 	Value,
 	ViewProps,
 } from '@tweakpane/core';
-import { ColorPickerController } from './colorPicker/controllers/colorPicker';
+import { ColorPickerController } from './colorPicker/controllers/colorPickerController';
+import { PopupController } from './colorPicker/controllers/PopupController';
 
 import {PluginView} from './view';
 
@@ -36,8 +34,6 @@ export class PluginController implements Controller<PluginView> {
 	private readonly popUpC: PopupController;
 
 	constructor(doc: Document, config: Config) {
-		this._onPoint = this._onPoint.bind(this);
-
 		// Receive the bound value from the plugin
 		this.value = config.value;
 

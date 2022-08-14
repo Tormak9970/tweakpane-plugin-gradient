@@ -1,11 +1,12 @@
 import { View, bindValue, Value, ViewProps, valueToClassName, ClassName } from "@tweakpane/core";
 
 interface Config {
+	container?:Element;
 	shows: Value<boolean>;
 	viewProps: ViewProps;
 }
 
-const className = ClassName('pop');
+const className = ClassName('pop_custom');
 
 /**
  * @hidden

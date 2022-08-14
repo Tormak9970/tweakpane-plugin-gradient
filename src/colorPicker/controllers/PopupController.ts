@@ -1,6 +1,8 @@
-import { Controller, createValue, PopupView, Value, ViewProps } from "@tweakpane/core";
+import { Controller, createValue, Value, ViewProps } from "@tweakpane/core";
+import { PopupView } from "../views/PopupView";
 
 interface Config {
+	container?:Element;
 	viewProps: ViewProps;
 }
 
@@ -13,6 +15,7 @@ export class PopupController implements Controller<PopupView> {
 		this.viewProps = config.viewProps;
 		this.view = new PopupView(doc, {
 			shows: this.shows,
+			// container: config.container,
 			viewProps: this.viewProps,
 		});
 	}

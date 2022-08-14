@@ -3,6 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<title></title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
 </head>
 <body>
 	<script src="../node_modules/tweakpane/dist/tweakpane.js"></script>
@@ -16,16 +24,11 @@
 		});
 
 		const params = {
-			'Color': '#000000',
 			'Gradient': [
 				{ color: '#32a852', stop: 0 },
 				{ color: '#3246a8', stop: 1 },
 			],
 		};
-
-		propsFolder.addInput(params, 'Color').on('change', (ev) => {
-			console.log(ev.value);
-		});
 
 		// Register plugin
 		pane.registerPlugin(TweakpaneGradientPlugin);

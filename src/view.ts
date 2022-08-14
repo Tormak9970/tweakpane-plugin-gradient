@@ -22,7 +22,6 @@ export class PluginView implements View {
 	private _setPos: HTMLElement;
 
 	colorButton: HTMLDivElement;
-	// private _stopColor: HTMLInputElement;
 
 	constructor(doc: Document, config: Config) {
 		// Create a root element for the plugin
@@ -92,12 +91,6 @@ export class PluginView implements View {
 			this.colorButton = doc.createElement('div');
 			this.colorButton.classList.add(className('stop_color_view'));
 			colCont.appendChild(this.colorButton);
-
-			// this._stopColor = doc.createElement('input');
-			// this._stopColor.type = "color";
-			// this._stopColor.classList.add(className('stop_color_input'));
-			// this._stopColor.addEventListener('input', this._setStopColor);
-			// colCont.appendChild(this._stopColor);
 
 			this.element.appendChild(colCont);
 		}
