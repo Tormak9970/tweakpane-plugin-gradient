@@ -31,10 +31,12 @@ pane.registerPlugin(TweakpaneGradientPlugin);
 pane.registerPlugin(TweakpaneGradientPlugin);
 
 const params = {
-  'Gradient': [
-    { color: '#32a852', stop: 0 },
-    { color: '#3246a8', stop: 1 },
-  ],
+  'Gradient': {
+    'stops': [
+      { color: '#32a852', stop: 0 },
+      { color: '#3246a8', stop: 1 },
+    ]
+  },
 };
 
 pane.addInput(params, 'Gradient', {

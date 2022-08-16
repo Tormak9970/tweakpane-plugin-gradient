@@ -25,10 +25,12 @@
 		});
 
 		const params = {
-			'Gradient': [
-				{ color: '#32a852', stop: 0 },
-				{ color: '#3246a8', stop: 1 },
-			],
+			'Gradient': {
+				'stops': [
+					{ color: '#32a852', stop: 0 },
+					{ color: '#3246a8', stop: 1 },
+				]
+			},
 		};
 
 		// Register plugin
@@ -36,7 +38,7 @@
 		propsFolder.addInput(params, 'Gradient', {
 			'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.HEX
 		}).on('change', (ev) => {
-			console.log(ev.value);
+			console.log(ev.value.dataURL);
 		});
 
 		window.pane = pane;

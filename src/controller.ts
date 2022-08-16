@@ -28,7 +28,7 @@ enum COLOR_SPACES {
 }
 
 interface Config {
-	value: Value<GradientStop[]>;
+	value: Value<PluginValue>;
 	expanded?: boolean,
 	colorSpace:COLOR_SPACES,
 	viewProps: ViewProps;
@@ -36,7 +36,7 @@ interface Config {
 
 // Custom controller class should implement `Controller` interface
 export class PluginController implements Controller<PluginView> {
-	public readonly value: Value<GradientStop[]>;
+	public readonly value: Value<PluginValue>;
 	public readonly view: PluginView;
 	public readonly viewProps: ViewProps;
 	
@@ -67,8 +67,8 @@ export class PluginController implements Controller<PluginView> {
 
 		// Receive the bound value from the plugin
 		this.value = config.value;
-		this._curStopPos.setRawValue(this.value.rawValue[0].stop);
-		this._curStopCol.setRawValue(this._gradientColToTweakCol(this.value.rawValue[0].color));
+		this._curStopPos.setRawValue(this.value.rawValue.stops[0].stop);
+		this._curStopCol.setRawValue(this._gradientColToTweakCol(this.value.rawValue.stops[0].color));
 
 		// and also view props
 		this.viewProps = config.viewProps;
@@ -181,16 +181,16 @@ export class PluginController implements Controller<PluginView> {
 	}
 
 	private _cycleStopIdx(dir:boolean) {
-		if (dir ? this._stopIdx.rawValue + 1 < this.value.rawValue.length : this._stopIdx.rawValue - 1 >= 0) {
+		if (dir ? this._stopIdx.rawValue + 1 < this.value.rawValue.stops.length : this._stopIdx.rawValue - 1 >= 0) {
 			this._setStopIdx(dir ? this._stopIdx.rawValue + 1 : this._stopIdx.rawValue - 1);
 		}
 	}
 
 	private _setStopIdx(newIdx:number) {
 		this._stopIdx.setRawValue(newIdx);
-		this._curStopPos.setRawValue(this.value.rawValue[newIdx].stop);
+		this._curStopPos.setRawValue(this.value.rawValue.stops[newIdx].stop);
 
-		const curVal = this.value.rawValue[newIdx];
+		const curVal = this.value.rawValue.stops[newIdx];
 		this._curStopCol.setRawValue(this._gradientColToTweakCol(curVal.color));
 	}
 
@@ -236,13 +236,13 @@ export class PluginController implements Controller<PluginView> {
 	}
 
 	private _addStop(e:Event) {
-		let newVal = [...this.value.rawValue];
+		let newVal = [...this.value.rawValue.stops];
 		const curVal = newVal[this._stopIdx.rawValue];
 
 		let newColor:ColorRGB|ColorHSV|string;
 		let newPos:number;
 		let splIdx:number;
-		if (this._stopIdx.rawValue < this.value.rawValue.length - 1) {
+		if (this._stopIdx.rawValue < this.value.rawValue.stops.length - 1) {
 			newPos = curVal.stop + Math.floor((newVal[this._stopIdx.rawValue+1].stop - curVal.stop) / 2 * 100) / 100;
 			splIdx = this._stopIdx.rawValue+1;
 		} else {
@@ -260,36 +260,44 @@ export class PluginController implements Controller<PluginView> {
 		newVal.splice(splIdx, 0,{
 			color: newColor,
 			stop: newPos
-		})
-		this.value.setRawValue(newVal);
+		});
+		this.value.setRawValue({
+			stops: newVal
+		});
 		this._stopIdx.setRawValue(splIdx);
 	}
 	private _removeStop(e:Event) {
-		if (this.value.rawValue.length > 2) {
+		if (this.value.rawValue.stops.length > 2) {
 			const idx = this._stopIdx.rawValue;
-			let newVal = [...this.value.rawValue];
+			let newVal = [...this.value.rawValue.stops];
 			newVal.splice(idx, 1);
-			this.value.setRawValue(newVal);
-			if (this._stopIdx.rawValue >= this.value.rawValue.length) this._stopIdx.setRawValue(idx-1);
+			this.value.setRawValue({
+				stops: newVal
+			});
+			if (this._stopIdx.rawValue >= this.value.rawValue.stops.length) this._stopIdx.setRawValue(idx-1);
 		}
 	}
 	private _setStopPos(e: { rawValue: number; }) {
-		let newVal = [...this.value.rawValue];
+		let newVal = [...this.value.rawValue.stops];
 		const curVal = newVal[this._stopIdx.rawValue];
 		newVal[this._stopIdx.rawValue] = {
 			color: curVal.color,
 			stop: e.rawValue
 		}
-		this.value.setRawValue(newVal);
+		this.value.setRawValue({
+			stops: newVal
+		});
 	}
 	private _setStopColor(e: { rawValue: Color; }) {
-		let newVal = [...this.value.rawValue];
+		let newVal = [...this.value.rawValue.stops];
 		const curVal = newVal[this._stopIdx.rawValue];
 		newVal[this._stopIdx.rawValue] = {
 			color: this._tweakColToGradientCol(e.rawValue),
 			stop: curVal.stop
 		}
-		this.value.setRawValue(newVal);
+		this.value.setRawValue({
+			stops: newVal
+		});
 	}
 
 	private _onButtonBlur(e: FocusEvent) {

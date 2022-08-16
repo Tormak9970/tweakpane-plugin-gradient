@@ -14,8 +14,8 @@ export enum COLOR_SPACES {
 	HEX='hex',
 }
 
-function isGradientStopArr(params: GradientStop[] | any): params is GradientStop[] {
-	return (params as GradientStop[]).every((grad) => grad.stop !== undefined && (((grad.color as ColorRGB).r !== undefined && (grad.color as ColorRGB).g !== undefined && (grad.color as ColorRGB).b !== undefined) || ((grad.color as ColorHSV).h !== undefined && (grad.color as ColorHSV).s !== undefined && (grad.color as ColorHSV).v !== undefined) || typeof grad.color === 'string'));
+function isGradientStopArr(params: PluginValue | any): params is PluginValue {
+	return (params as PluginValue).stops.every((grad) => grad.stop !== undefined && (((grad.color as ColorRGB).r !== undefined && (grad.color as ColorRGB).g !== undefined && (grad.color as ColorRGB).b !== undefined) || ((grad.color as ColorHSV).h !== undefined && (grad.color as ColorHSV).s !== undefined && (grad.color as ColorHSV).v !== undefined) || typeof grad.color === 'string'));
 }
 
 export interface PluginInputParams extends BaseInputParams {
@@ -23,8 +23,8 @@ export interface PluginInputParams extends BaseInputParams {
 }
 
 export const GradientGeneratorPlugin: InputBindingPlugin<
-	GradientStop[],
-	GradientStop[],
+	PluginValue,
+	PluginValue,
 	PluginInputParams
 > = {
 	id: 'gradient',
@@ -32,7 +32,7 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 	css: '__css__',
 
 	accept(exValue: unknown, params: Record<string, unknown>) {
-		if (!isGradientStopArr(exValue) && (exValue as GradientStop[])?.length > 0) {
+		if (!isGradientStopArr(exValue) && (exValue as PluginValue)?.stops.length > 0) {
 			// Return null to deny the user input
 			return null;
 		}
@@ -54,19 +54,21 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 
 		// Return a typed value and params to accept the user input
 		return {
-			initialValue: exValue as GradientStop[],
+			initialValue: exValue as PluginValue,
 			params: result,
 		};
 	},
 
 	binding: {
 		reader(_args) {
-			return (exValue: unknown): GradientStop[] => {
+			return (exValue: unknown): PluginValue => {
 				// Convert an external unknown value into the internal value
-				return isGradientStopArr(exValue) ? exValue as GradientStop[] : [
-					{ color: '#000000', stop: 0.0 },
-					{ color: '#ffffff', stop: 1.0 },
-				];
+				return isGradientStopArr(exValue) ? exValue as PluginValue : {
+					'stops': [
+						{ color: '#000000', stop: 0.0 },
+						{ color: '#ffffff', stop: 1.0 },
+					]
+				};
 			};
 		},
 

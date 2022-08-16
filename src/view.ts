@@ -1,7 +1,7 @@
 import {ClassName, Color, createValue, Value, View, ViewProps} from '@tweakpane/core';
 
 interface Config {
-	value: Value<GradientStop[]>;
+	value: Value<PluginValue>;
 	curStopPos:Value<number>;
 	colBtnCol:Color;
 	viewProps: ViewProps;
@@ -16,7 +16,7 @@ const canvasWidth:number = 150;
 // Custom view class should implement `View` interface
 export class PluginView implements View {
 	public readonly element: HTMLElement;
-	private _value: Value<GradientStop[]>;
+	private _value: Value<PluginValue>;
 
 	addStop: HTMLDivElement;
 	removeStop: HTMLDivElement;
@@ -193,8 +193,8 @@ export class PluginView implements View {
 		this._cnvsStopsArr.map(e => { e.remove(); });
 		this._cnvsStopsArr = [];
 
-		for (let i = 0; i < rawValue.length; i++) {
-			const stop = rawValue[i];
+		for (let i = 0; i < rawValue.stops.length; i++) {
+			const stop = rawValue.stops[i];
 
 			gradient.addColorStop(stop.stop, (typeof stop.color == 'string' ? stop.color : ((stop.color as ColorRGB).r !== undefined ? `rgb(${(stop.color as ColorRGB).r}, ${(stop.color as ColorRGB).g}, ${(stop.color as ColorRGB).b})` : `hsv(${(stop.color as ColorHSV).h}, ${(stop.color as ColorHSV).s}, ${(stop.color as ColorHSV).v})`)));
 
@@ -227,5 +227,9 @@ export class PluginView implements View {
 
 	private _onValueChange() {
 		this._refresh();
+		this._value.setRawValue({
+			dataURL: this.getCanvasTexture(),
+			stops: this._value.rawValue.stops
+		})
 	}
 }

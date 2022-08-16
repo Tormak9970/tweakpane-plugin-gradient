@@ -13,3 +13,8 @@ type GradientStop = {
 	color:ColorRGB|ColorHSV|string,
 	stop:number
 }
+
+type PluginValue = {
+	dataURL?:string,
+	stops: GradientStop[]
+}
