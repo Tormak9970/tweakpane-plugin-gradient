@@ -1,6 +1,5 @@
 import {
 	Color,
-	colorToHexRgbString,
 	connectValues,
 	Controller,
 	createNumberFormatter,
@@ -9,7 +8,6 @@ import {
 	Foldable,
 	forceCast,
 	getSuitableDecimalDigits,
-	getSuitableDraggingScale,
 	NumberTextController,
 	parseNumber,
 	supportsTouch,
@@ -149,7 +147,7 @@ export class PluginController implements Controller<PluginView> {
 		});
 		connectValues({
 			primary: this._curStopCol,
-			secondary: this.colorPickerC.value,
+			secondary: this.view.colBtnCol,
 			forward: (p) => p.rawValue,
 			backward: (_, s) => s.rawValue,
 		});

@@ -86,8 +86,28 @@
 		border-radius: 2px;
 		
 		margin-bottom: 14px;
+
+		position: relative;
 	}
 	&_canvas {}
+	&_canvas_marker {
+		width: 9px;
+		height: 13px;
+		cursor: pointer;
+		position: absolute;
+	}
+	&_marker_top {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0 4.5px 4px 4.5px;
+		border-color: transparent transparent var(--in-fg) transparent;
+	}
+	&_marker_col_disp {
+		border: 1px solid var(--in-fg);
+		width: 7px;
+		height: 7px;
+	}
 
 
 	&_ctrl_cont {

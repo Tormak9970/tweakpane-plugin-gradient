@@ -10,6 +10,8 @@ interface Config {
 // ClassName('tmp') will generate a CSS class name like `tp-tmpv`
 const className = ClassName('gradient');
 
+const canvasWidth:number = 150;
+
 // Custom view class should implement `View` interface
 export class PluginView implements View {
 	public readonly element: HTMLElement;
@@ -26,9 +28,11 @@ export class PluginView implements View {
 	setPos: HTMLElement;
 
 	colorButton: HTMLDivElement;
-	colBtnCol:Color;
+	colBtnCol:Value<Color>;
 
 	stopIdx:Value<number> = createValue<number>(0);
+
+	private _cnvsStopsArr:Element[] = [];
 
 	constructor(doc: Document, config: Config) {
 		// Create a root element for the plugin
@@ -39,7 +43,7 @@ export class PluginView implements View {
 
 		// Receive the bound value from the controller
 		this._value = config.value;
-		this.colBtnCol = config.colBtnCol;
+		this.colBtnCol = createValue<Color>(config.colBtnCol);
 		// Handle 'change' event of the value
 		this._value.emitter.on('change', this._onValueChange.bind(this));
 		this.stopIdx.emitter.on('change', this._onValueChange.bind(this));
@@ -69,7 +73,7 @@ export class PluginView implements View {
 
 			this._canvas = doc.createElement('canvas');
 			this._canvas.height = 20;
-			this._canvas.width = 150;
+			this._canvas.width = canvasWidth;
 			this._canvas.classList.add(className('canvas'));
 			canvasCont.appendChild(this._canvas);
 			this.element.appendChild(canvasCont);
@@ -136,27 +140,47 @@ export class PluginView implements View {
 	private _refresh(): void {
 		this._idxDisp.innerText = this.stopIdx.rawValue.toString();
 
-		const color = this.colBtnCol.getComponents(this.colBtnCol.mode, 'int');
-		this.colorButton.style.backgroundColor = `${this.colBtnCol.mode == 'rgb' ? 'rgb' : (this.colBtnCol.mode == 'hsv' ? 'hsv' : 'hsl')}(${color[0]}, ${color[1]}, ${color[2]})`
+		const color = this.colBtnCol.rawValue.getComponents(this.colBtnCol.rawValue.mode, 'int');
+		this.colorButton.style.backgroundColor = `${this.colBtnCol.rawValue.mode == 'rgb' ? 'rgb' : (this.colBtnCol.rawValue.mode == 'hsv' ? 'hsv' : 'hsl')}(${color[0]}, ${color[1]}, ${color[2]})`
 		const rawValue = this._value.rawValue;
 
 		const ctx = <CanvasRenderingContext2D>this._canvas.getContext("2d");
 
 		ctx.fillStyle = '#000000';
-		ctx.fillRect(0, 0, 150, 20);
+		ctx.fillRect(0, 0, canvasWidth, 20);
 
-		const gradient = ctx.createLinearGradient(0, 0, 150, 0);
+		const gradient = ctx.createLinearGradient(0, 0, canvasWidth, 0);
 
+		this._cnvsStopsArr.map(e => {
+			e.remove();
+		});
+		this._cnvsStopsArr = [];
 		for (let i = 0; i < rawValue.length; i++) {
 			const stop = rawValue[i];
 
 			gradient.addColorStop(stop.stop, (typeof stop.color == 'string' ? stop.color : ((stop.color as ColorRGB).r !== undefined ? `rgb(${(stop.color as ColorRGB).r}, ${(stop.color as ColorRGB).g}, ${(stop.color as ColorRGB).b})` : `hsv(${(stop.color as ColorHSV).h}, ${(stop.color as ColorHSV).s}, ${(stop.color as ColorHSV).v})`)));
 
 			// create little indicator here and set pos
+			const sElem = document.createElement('div');
+			sElem.classList.add(className('canvas_marker'));
+			sElem.style.left = `${stop.stop * canvasWidth - 2}px`;
+			sElem.style.bottom = `-8px`;
+
+			const top = document.createElement('div');
+			top.classList.add(className('marker_top'));
+			sElem.appendChild(top);
+
+			const colDisp = document.createElement('div');
+			colDisp.classList.add(className('marker_col_disp'));
+			colDisp.style.backgroundColor = `${(typeof stop.color == 'string' ? stop.color : ((stop.color as ColorRGB).r !== undefined ? `rgb(${(stop.color as ColorRGB).r}, ${(stop.color as ColorRGB).g}, ${(stop.color as ColorRGB).b})` : `hsv(${(stop.color as ColorHSV).h}, ${(stop.color as ColorHSV).s}, ${(stop.color as ColorHSV).v})`))}`;
+			sElem.appendChild(colDisp);
+			
+			this._cnvsStopsArr.push(sElem);
+			this._canvas.parentElement?.appendChild(sElem);
 		}
 
 		ctx.fillStyle = gradient;
-		ctx.fillRect(0, 0, 150, 20);
+		ctx.fillRect(0, 0, canvasWidth, 20);
 	}
 
 	private _onValueChange() {

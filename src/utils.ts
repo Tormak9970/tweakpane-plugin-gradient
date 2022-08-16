@@ -18,5 +18,10 @@ export function hexToRGB(hex:string) {
 }
 
 export function rgbToHex(rgb:number[]): string {
-    return `#${rgb[0].toString(16)}${rgb[1].toString(16)}${rgb[2].toString(16)}`;
+    const ret = rgb.map(c => {
+        c = Math.round(c);
+        let r = c.toString(16);
+        return r.length == 1 ? `0${r}` : r;
+    });
+    return `#${ret[0]}${ret[1]}${ret[2]}`;
 }
