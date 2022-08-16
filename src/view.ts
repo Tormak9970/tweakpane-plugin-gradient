@@ -72,17 +72,15 @@ export class PluginView implements View {
 		}
 
 
-		{
-			const canvasCont = doc.createElement('div');
-			canvasCont.classList.add(className('canvas_cont'));
+		const canvasCont = doc.createElement('div');
+		canvasCont.classList.add(className('canvas_cont'));
 
-			this._canvas = doc.createElement('canvas');
-			this._canvas.height = 20;
-			this._canvas.width = canvasWidth;
-			this._canvas.classList.add(className('canvas'));
-			canvasCont.appendChild(this._canvas);
-			this.element.appendChild(canvasCont);
-		}
+		this._canvas = doc.createElement('canvas');
+		this._canvas.height = 20;
+		this._canvas.width = canvasWidth;
+		this._canvas.classList.add(className('canvas'));
+		canvasCont.appendChild(this._canvas);
+		this.element.appendChild(canvasCont);
 		
 
 		{
@@ -137,26 +135,31 @@ export class PluginView implements View {
 		// Apply the initial value
 		this._refresh();
 
+		const moveHandler = (e:MouseEvent) => {
+			if (this.movingStop) {
+				// const value = Math.floor((this._value.rawValue[this.stopIdx.rawValue].stop + (e.movementX / canvasWidth)) * 100) / 100;
+				console.log(e.pageX - this._canvas.getBoundingClientRect().left);
+				const value = Math.floor((e.pageX - this._canvas.getBoundingClientRect().left) / canvasWidth * 100) / 100;
+
+				if (value >= 0 && value <= 1) {
+					this.curStopPos.setRawValue(value);
+				}
+			}
+		}
+		moveHandler.bind(this);
+
 		config.viewProps.handleDispose(() => {
 			this._value.emitter.off('change', this._onValueChange.bind(this));
 			doc.removeEventListener('mouseup', (e) => {
 				if (this.movingStop) this.movingStop = false;
 			})
-			doc.removeEventListener('mousemove')
+			doc.removeEventListener('mousemove', moveHandler);
 		});
 
 		doc.addEventListener('mouseup', (e) => {
 			if (this.movingStop) this.movingStop = false;
 		});
-		doc.addEventListener('mousemove', (e:MouseEvent) => {
-			if (this.movingStop) {
-				const value = Math.floor((this._value.rawValue[this.stopIdx.rawValue].stop + (e.movementX / canvasWidth)) * 100) / 100;
-				
-				if (value >= 0 && value <= 1) {
-					this.curStopPos.setRawValue(value);
-				}
-			}
-		});
+		doc.addEventListener('mousemove', moveHandler);
 	}
 
 	private _refresh(): void {
