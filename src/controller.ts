@@ -76,7 +76,7 @@ export class PluginController implements Controller<PluginView> {
 		this._foldable = Foldable.create(config.expanded ? config.expanded : false);
 
 		// Create a custom view
-		this.view = new PluginView(doc, { value: this.value, colBtnCol: this._curStopCol.rawValue, viewProps: this.viewProps, });
+		this.view = new PluginView(doc, { value: this.value, curStopPos: this._curStopPos, colBtnCol: this._curStopCol.rawValue, viewProps: this.viewProps, });
 		const buttonElem = this.view.colorButton;
 		buttonElem.addEventListener('blur', this._onButtonBlur);
 		buttonElem.addEventListener('click', this._onButtonClick);
@@ -128,11 +128,20 @@ export class PluginController implements Controller<PluginView> {
 			forward: (p) => p.rawValue,
 			backward: (_, s) => s.rawValue,
 		});
+		this._stopIdx.emitter.on('change', (e) => {
+			this._setStopIdx(e.rawValue);
+		})
 
 		// connect curStopPos variables
 		connectValues({
 			primary: this._curStopPos,
 			secondary: this.posInput.value,
+			forward: (p) => p.rawValue,
+			backward: (_, s) => s.rawValue,
+		});
+		connectValues({
+			primary: this._curStopPos,
+			secondary: this.view.curStopPos,
 			forward: (p) => p.rawValue,
 			backward: (_, s) => s.rawValue,
 		});
@@ -173,13 +182,16 @@ export class PluginController implements Controller<PluginView> {
 
 	private _cycleStopIdx(dir:boolean) {
 		if (dir ? this._stopIdx.rawValue + 1 < this.value.rawValue.length : this._stopIdx.rawValue - 1 >= 0) {
-			const newIdx = dir ? this._stopIdx.rawValue + 1 : this._stopIdx.rawValue - 1;
-			this._stopIdx.setRawValue(newIdx);
-			this._curStopPos.setRawValue(this.value.rawValue[newIdx].stop);
-
-			const curVal = this.value.rawValue[newIdx];
-			this._curStopCol.setRawValue(this._gradientColToTweakCol(curVal.color));
+			this._setStopIdx(dir ? this._stopIdx.rawValue + 1 : this._stopIdx.rawValue - 1);
 		}
+	}
+
+	private _setStopIdx(newIdx:number) {
+		this._stopIdx.setRawValue(newIdx);
+		this._curStopPos.setRawValue(this.value.rawValue[newIdx].stop);
+
+		const curVal = this.value.rawValue[newIdx];
+		this._curStopCol.setRawValue(this._gradientColToTweakCol(curVal.color));
 	}
 
 	private _tweakColToGradientCol(curVal: Color): ColorRGB | ColorHSV | string {

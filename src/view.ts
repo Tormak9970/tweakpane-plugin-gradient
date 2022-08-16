@@ -2,6 +2,7 @@ import {ClassName, Color, createValue, Value, View, ViewProps} from '@tweakpane/
 
 interface Config {
 	value: Value<GradientStop[]>;
+	curStopPos:Value<number>;
 	colBtnCol:Color;
 	viewProps: ViewProps;
 }
@@ -29,10 +30,13 @@ export class PluginView implements View {
 
 	colorButton: HTMLDivElement;
 	colBtnCol:Value<Color>;
+	curStopPos:Value<number>;
 
 	stopIdx:Value<number> = createValue<number>(0);
 
-	private _cnvsStopsArr:Element[] = [];
+	movingStop:boolean = false;
+
+	private _cnvsStopsArr:HTMLDivElement[] = [];
 
 	constructor(doc: Document, config: Config) {
 		// Create a root element for the plugin
@@ -44,6 +48,7 @@ export class PluginView implements View {
 		// Receive the bound value from the controller
 		this._value = config.value;
 		this.colBtnCol = createValue<Color>(config.colBtnCol);
+		this.curStopPos = config.curStopPos;
 		// Handle 'change' event of the value
 		this._value.emitter.on('change', this._onValueChange.bind(this));
 		this.stopIdx.emitter.on('change', this._onValueChange.bind(this));
@@ -134,6 +139,23 @@ export class PluginView implements View {
 
 		config.viewProps.handleDispose(() => {
 			this._value.emitter.off('change', this._onValueChange.bind(this));
+			doc.removeEventListener('mouseup', (e) => {
+				if (this.movingStop) this.movingStop = false;
+			})
+			doc.removeEventListener('mousemove')
+		});
+
+		doc.addEventListener('mouseup', (e) => {
+			if (this.movingStop) this.movingStop = false;
+		});
+		doc.addEventListener('mousemove', (e:MouseEvent) => {
+			if (this.movingStop) {
+				const value = Math.floor((this._value.rawValue[this.stopIdx.rawValue].stop + (e.movementX / canvasWidth)) * 100) / 100;
+				
+				if (value >= 0 && value <= 1) {
+					this.curStopPos.setRawValue(value);
+				}
+			}
 		});
 	}
 
@@ -151,20 +173,23 @@ export class PluginView implements View {
 
 		const gradient = ctx.createLinearGradient(0, 0, canvasWidth, 0);
 
-		this._cnvsStopsArr.map(e => {
-			e.remove();
-		});
+		this._cnvsStopsArr.map(e => { e.remove(); });
 		this._cnvsStopsArr = [];
+
 		for (let i = 0; i < rawValue.length; i++) {
 			const stop = rawValue[i];
 
 			gradient.addColorStop(stop.stop, (typeof stop.color == 'string' ? stop.color : ((stop.color as ColorRGB).r !== undefined ? `rgb(${(stop.color as ColorRGB).r}, ${(stop.color as ColorRGB).g}, ${(stop.color as ColorRGB).b})` : `hsv(${(stop.color as ColorHSV).h}, ${(stop.color as ColorHSV).s}, ${(stop.color as ColorHSV).v})`)));
 
-			// create little indicator here and set pos
 			const sElem = document.createElement('div');
 			sElem.classList.add(className('canvas_marker'));
+			sElem.setAttribute('idx', i.toString());
 			sElem.style.left = `${stop.stop * canvasWidth - 2}px`;
 			sElem.style.bottom = `-8px`;
+			sElem.addEventListener('mousedown', (e) => {
+				this.movingStop = true;
+				this.stopIdx.setRawValue(parseInt((e.currentTarget as Element).getAttribute('idx') as string))
+			});
 
 			const top = document.createElement('div');
 			top.classList.add(className('marker_top'));
