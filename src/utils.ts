@@ -25,3 +25,49 @@ export function rgbToHex(rgb:number[]): string {
     });
     return `#${ret[0]}${ret[1]}${ret[2]}`;
 }
+
+export function rgbToHsv(rgb:number[]) {
+    let rabs:number;
+    let gabs:number;
+    let babs:number;
+    let rr:number;
+    let gg:number;
+    let bb:number;
+    let h:number;
+    let s:number;
+    let v:number;
+    rabs = rgb[0] > 1 ? rgb[0] / 255: rgb[0];
+    gabs = rgb[1] > 1 ? rgb[1] / 255: rgb[1];
+    babs = rgb[2] > 1 ? rgb[2] / 255: rgb[2];
+    v = Math.max(rabs, gabs, babs);
+    const diff = v - Math.min(rabs, gabs, babs);
+    const diffc = (c:number) => (v - c) / 6 / diff + 1 / 2;
+    const percentRoundFn = (num:number) => Math.round(num * 100) / 100;
+    if (diff == 0) {
+        h = s = 0;
+    } else {
+        s = diff / v;
+        rr = diffc(rabs);
+        gg = diffc(gabs);
+        bb = diffc(babs);
+
+        if (rabs === v) {
+            h = bb - gg;
+        } else if (gabs === v) {
+            h = (1 / 3) + rr - bb;
+        } else { //(babs === v)
+            h = (2 / 3) + gg - rr;
+        }
+
+        if (h < 0) {
+            h += 1;
+        }else if (h > 1) {
+            h -= 1;
+        }
+    }
+    return {
+        h: Math.round(h * 360),
+        s: percentRoundFn(s * 100),
+        v: percentRoundFn(v * 100)
+    };
+}

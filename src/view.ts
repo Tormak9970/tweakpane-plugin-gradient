@@ -162,6 +162,20 @@ export class PluginView implements View {
 		doc.addEventListener('mousemove', moveHandler);
 	}
 
+	getCanvasTexture() {
+		return this._canvas.toDataURL();
+	}
+
+	getColorAtPoint(pos:number) {
+		const ctx = <CanvasRenderingContext2D>this._canvas.getContext("2d");
+		const p = ctx.getImageData(pos * canvasWidth, 0, 1, 1).data;
+		return {
+			r: p[0],
+			g: p[1],
+			b: p[2]
+		}
+	}
+
 	private _refresh(): void {
 		this._idxDisp.innerText = this.stopIdx.rawValue.toString();
 

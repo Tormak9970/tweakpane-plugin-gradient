@@ -17,7 +17,7 @@ import {
 } from '@tweakpane/core';
 import { ColorPickerController } from './colorPicker/controllers/colorPickerController';
 import { PopupController } from './colorPicker/controllers/PopupController';
-import { hexToRGB, rgbToHex } from './utils';
+import { hexToRGB, rgbToHex, rgbToHsv } from './utils';
 
 import {PluginView} from './view';
 
@@ -236,10 +236,42 @@ export class PluginController implements Controller<PluginView> {
 	}
 
 	private _addStop(e:Event) {
+		let newVal = [...this.value.rawValue];
+		const curVal = newVal[this._stopIdx.rawValue];
 
+		let newColor:ColorRGB|ColorHSV|string;
+		let newPos:number;
+		let splIdx:number;
+		if (this._stopIdx.rawValue < this.value.rawValue.length - 1) {
+			newPos = curVal.stop + Math.floor((newVal[this._stopIdx.rawValue+1].stop - curVal.stop) / 2 * 100) / 100;
+			splIdx = this._stopIdx.rawValue+1;
+		} else {
+			newPos = newVal[this._stopIdx.rawValue-1].stop + Math.floor((curVal.stop - newVal[this._stopIdx.rawValue-1].stop) / 2 * 100) / 100;
+			splIdx = this._stopIdx.rawValue;
+		}
+		newColor = this.view.getColorAtPoint(newPos);
+
+		if (this._colorSpace == COLOR_SPACES.HEX) {
+			newColor = rgbToHex(Object.values(newColor));
+		} else if (this._colorSpace == COLOR_SPACES.HSV) {
+			newColor = rgbToHsv(Object.values(newColor));
+		}
+
+		newVal.splice(splIdx, 0,{
+			color: newColor,
+			stop: newPos
+		})
+		this.value.setRawValue(newVal);
+		this._stopIdx.setRawValue(splIdx);
 	}
 	private _removeStop(e:Event) {
-
+		if (this.value.rawValue.length > 2) {
+			const idx = this._stopIdx.rawValue;
+			let newVal = [...this.value.rawValue];
+			newVal.splice(idx, 1);
+			this.value.setRawValue(newVal);
+			if (this._stopIdx.rawValue >= this.value.rawValue.length) this._stopIdx.setRawValue(idx-1);
+		}
 	}
 	private _setStopPos(e: { rawValue: number; }) {
 		let newVal = [...this.value.rawValue];
