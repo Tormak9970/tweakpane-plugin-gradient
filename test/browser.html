@@ -38,7 +38,7 @@
 		propsFolder.addInput(params, 'Gradient', {
 			'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.HEX
 		}).on('change', (ev) => {
-			console.log(ev.value.dataURL);
+			console.log(ev.value.getGradient());
 		});
 
 		window.pane = pane;

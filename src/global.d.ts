@@ -16,5 +16,6 @@ type GradientStop = {
 
 type PluginValue = {
 	dataURL?:string,
-	stops: GradientStop[]
+	stops: GradientStop[],
+	getGradient: () => string
 }

@@ -137,8 +137,6 @@ export class PluginView implements View {
 
 		const moveHandler = (e:MouseEvent) => {
 			if (this.movingStop) {
-				// const value = Math.floor((this._value.rawValue[this.stopIdx.rawValue].stop + (e.movementX / canvasWidth)) * 100) / 100;
-				console.log(e.pageX - this._canvas.getBoundingClientRect().left);
 				const value = Math.floor((e.pageX - this._canvas.getBoundingClientRect().left) / canvasWidth * 100) / 100;
 
 				if (value >= 0 && value <= 1) {
@@ -227,9 +225,5 @@ export class PluginView implements View {
 
 	private _onValueChange() {
 		this._refresh();
-		this._value.setRawValue({
-			dataURL: this.getCanvasTexture(),
-			stops: this._value.rawValue.stops
-		})
 	}
 }

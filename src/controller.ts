@@ -77,6 +77,10 @@ export class PluginController implements Controller<PluginView> {
 
 		// Create a custom view
 		this.view = new PluginView(doc, { value: this.value, curStopPos: this._curStopPos, colBtnCol: this._curStopCol.rawValue, viewProps: this.viewProps, });
+		this.value.setRawValue({
+			stops: this.value.rawValue.stops,
+			getGradient: this.view.getCanvasTexture.bind(this.view)
+		})
 		const buttonElem = this.view.colorButton;
 		buttonElem.addEventListener('blur', this._onButtonBlur);
 		buttonElem.addEventListener('click', this._onButtonClick);
@@ -218,7 +222,6 @@ export class PluginController implements Controller<PluginView> {
 		}
 	}
 	private _gradientColToTweakCol(curVal: ColorRGB | ColorHSV | string): Color {
-		console.log(this._colorSpace)
 		switch (this._colorSpace) {
 			case COLOR_SPACES.RGB: {
 				let c = curVal as ColorRGB;
@@ -262,7 +265,8 @@ export class PluginController implements Controller<PluginView> {
 			stop: newPos
 		});
 		this.value.setRawValue({
-			stops: newVal
+			stops: newVal,
+			getGradient: this.view.getCanvasTexture.bind(this.view)
 		});
 		this._stopIdx.setRawValue(splIdx);
 	}
@@ -272,7 +276,8 @@ export class PluginController implements Controller<PluginView> {
 			let newVal = [...this.value.rawValue.stops];
 			newVal.splice(idx, 1);
 			this.value.setRawValue({
-				stops: newVal
+				stops: newVal,
+				getGradient: this.view.getCanvasTexture.bind(this.view)
 			});
 			if (this._stopIdx.rawValue >= this.value.rawValue.stops.length) this._stopIdx.setRawValue(idx-1);
 		}
@@ -285,7 +290,8 @@ export class PluginController implements Controller<PluginView> {
 			stop: e.rawValue
 		}
 		this.value.setRawValue({
-			stops: newVal
+			stops: newVal,
+			getGradient: this.view.getCanvasTexture.bind(this.view)
 		});
 	}
 	private _setStopColor(e: { rawValue: Color; }) {
@@ -296,7 +302,8 @@ export class PluginController implements Controller<PluginView> {
 			stop: curVal.stop
 		}
 		this.value.setRawValue({
-			stops: newVal
+			stops: newVal,
+			getGradient: this.view.getCanvasTexture.bind(this.view)
 		});
 	}
 

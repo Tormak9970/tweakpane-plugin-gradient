@@ -67,7 +67,8 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 					'stops': [
 						{ color: '#000000', stop: 0.0 },
 						{ color: '#ffffff', stop: 1.0 },
-					]
+					],
+					'getGradient': () => { return "tmp"; }
 				};
 			};
 		},

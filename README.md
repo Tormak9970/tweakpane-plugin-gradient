@@ -1,5 +1,5 @@
 # Tweakpane plugin template
-Plugin template of an input binding for [Tweakpane][tweakpane].
+Gradient Generator input binding for [Tweakpane][tweakpane].
 
 
 ## Installation
@@ -42,7 +42,7 @@ const params = {
 pane.addInput(params, 'Gradient', {
   'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.RGB
 }).on('change', (ev) => {
-  console.log(ev.value);
+  console.log(ev.value.getGradient());
 });
 ```
 
