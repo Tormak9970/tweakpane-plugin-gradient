@@ -36,6 +36,7 @@
 		// Register plugin
 		pane.registerPlugin(TweakpaneGradientPlugin);
 		propsFolder.addInput(params, 'Gradient', {
+			'view': 'gradient',
 			'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.HEX
 		}).on('change', (ev) => {
 			console.log(ev.value.getGradient());

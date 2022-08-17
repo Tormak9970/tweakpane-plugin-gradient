@@ -40,6 +40,7 @@ const params = {
 };
 
 pane.addInput(params, 'Gradient', {
+	'view': 'gradient',
   'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.RGB
 }).on('change', (ev) => {
   console.log(ev.value.getGradient());

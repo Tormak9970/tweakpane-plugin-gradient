@@ -1,8 +1,8 @@
 {
   "name": "@tormak/tweakpane-plugin-gradient",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Gradient Plugin for Tweakpane",
-  "main": "dist/tweakpane-plugin-gradient.js",
+  "main": "dist/tormak-tweakpane-plugin-gradient.js",
   "types": "dist/types/index.d.ts",
   "author": {
     "name": "Travis Lane",
