@@ -224,22 +224,22 @@ export class PluginController implements Controller<PluginView> {
 	private _gradientColToTweakCol(curVal: ColorRGB | ColorHSV | string): Color {
 		switch (this._colorSpace) {
 			case COLOR_SPACES.RGB: {
-				let c = curVal as ColorRGB;
+				const c = curVal as ColorRGB;
 				return new Color([c.r, c.g, c.b], 'rgb');
 			}
 			case COLOR_SPACES.HSV: {
-				let c = curVal as ColorHSV;
+				const c = curVal as ColorHSV;
 				return new Color([c.h, c.s, c.v], 'hsv');
 			}
 			case COLOR_SPACES.HEX: {
-				let c = hexToRGB(curVal as string);
+				const c = hexToRGB(curVal as string);
 				return new Color([c.r, c.g, c.b], 'rgb');
 			}
 		}
 	}
 
-	private _addStop(e:Event) {
-		let newVal = [...this.value.rawValue.stops];
+	private _addStop() {
+		const newVal = [...this.value.rawValue.stops];
 		const curVal = newVal[this._stopIdx.rawValue];
 
 		let newColor:ColorRGB|ColorHSV|string;
@@ -270,10 +270,10 @@ export class PluginController implements Controller<PluginView> {
 		});
 		this._stopIdx.setRawValue(splIdx);
 	}
-	private _removeStop(e:Event) {
+	private _removeStop() {
 		if (this.value.rawValue.stops.length > 2) {
 			const idx = this._stopIdx.rawValue;
-			let newVal = [...this.value.rawValue.stops];
+			const newVal = [...this.value.rawValue.stops];
 			newVal.splice(idx, 1);
 			this.value.setRawValue({
 				stops: newVal,
@@ -283,7 +283,7 @@ export class PluginController implements Controller<PluginView> {
 		}
 	}
 	private _setStopPos(e: { rawValue: number; }) {
-		let newVal = [...this.value.rawValue.stops];
+		const newVal = [...this.value.rawValue.stops];
 		const curVal = newVal[this._stopIdx.rawValue];
 		newVal[this._stopIdx.rawValue] = {
 			color: curVal.color,
@@ -295,7 +295,7 @@ export class PluginController implements Controller<PluginView> {
 		});
 	}
 	private _setStopColor(e: { rawValue: Color; }) {
-		let newVal = [...this.value.rawValue.stops];
+		const newVal = [...this.value.rawValue.stops];
 		const curVal = newVal[this._stopIdx.rawValue];
 		newVal[this._stopIdx.rawValue] = {
 			color: this._tweakColToGradientCol(e.rawValue),

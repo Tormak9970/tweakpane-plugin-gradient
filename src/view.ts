@@ -11,7 +11,7 @@ interface Config {
 // ClassName('tmp') will generate a CSS class name like `tp-tmpv`
 const className = ClassName('gradient');
 
-const canvasWidth:number = 150;
+const canvasWidth = 150;
 
 // Custom view class should implement `View` interface
 export class PluginView implements View {
@@ -34,7 +34,7 @@ export class PluginView implements View {
 
 	stopIdx:Value<number> = createValue<number>(0);
 
-	movingStop:boolean = false;
+	movingStop = false;
 
 	private _cnvsStopsArr:HTMLDivElement[] = [];
 
@@ -148,13 +148,13 @@ export class PluginView implements View {
 
 		config.viewProps.handleDispose(() => {
 			this._value.emitter.off('change', this._onValueChange.bind(this));
-			doc.removeEventListener('mouseup', (e) => {
+			doc.removeEventListener('mouseup', () => {
 				if (this.movingStop) this.movingStop = false;
 			})
 			doc.removeEventListener('mousemove', moveHandler);
 		});
 
-		doc.addEventListener('mouseup', (e) => {
+		doc.addEventListener('mouseup', () => {
 			if (this.movingStop) this.movingStop = false;
 		});
 		doc.addEventListener('mousemove', moveHandler);

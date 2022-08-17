@@ -41,8 +41,7 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 		const p = ParamsParsers;
 		const result = parseParams<PluginInputParams>(params, {
 			colorSpace: p.optional.custom((value:unknown) => {
-				// @ts-ignore
-				if (Object.values(COLOR_SPACES).includes(value)) {
+				if (Object.values(COLOR_SPACES).includes(value as COLOR_SPACES)) {
 					return value as COLOR_SPACES;
 				}
 				return COLOR_SPACES.RGB

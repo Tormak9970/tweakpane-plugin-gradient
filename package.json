@@ -1,10 +1,14 @@
 {
-  "name": "tweakpane-plugin-gradient",
+  "name": "@tormak/tweakpane-plugin-gradient",
   "version": "1.0.0",
   "description": "Gradient Plugin for Tweakpane",
   "main": "dist/tweakpane-plugin-gradient.js",
   "types": "dist/types/index.d.ts",
-  "author": "cocopon",
+  "author": {
+    "name": "Travis Lane",
+    "email": "Tormak9970@gmail.com",
+    "url": "https://travislane.dev"
+  },
   "license": "MIT",
   "files": [
     "dist"

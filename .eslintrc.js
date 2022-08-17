@@ -5,14 +5,14 @@ module.exports = {
 		'plugin:@typescript-eslint/recommended',
 	],
 	parser: '@typescript-eslint/parser',
-	plugins: ['@typescript-eslint', 'simple-import-sort'],
+	plugins: ['@typescript-eslint'],
 	root: true,
 	rules: {
 		camelcase: 'off',
 		'no-unused-vars': 'off',
 		'sort-imports': 'off',
 
-		'simple-import-sort/imports': 'error',
+		// 'simple-import-sort/imports': 'error',
 		'@typescript-eslint/naming-convention': [
 			'error',
 			{

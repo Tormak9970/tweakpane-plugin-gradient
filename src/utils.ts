@@ -20,26 +20,22 @@ export function hexToRGB(hex:string) {
 export function rgbToHex(rgb:number[]): string {
     const ret = rgb.map(c => {
         c = Math.round(c);
-        let r = c.toString(16);
+        const r = c.toString(16);
         return r.length == 1 ? `0${r}` : r;
     });
     return `#${ret[0]}${ret[1]}${ret[2]}`;
 }
 
 export function rgbToHsv(rgb:number[]) {
-    let rabs:number;
-    let gabs:number;
-    let babs:number;
     let rr:number;
     let gg:number;
     let bb:number;
     let h:number;
     let s:number;
-    let v:number;
-    rabs = rgb[0] > 1 ? rgb[0] / 255: rgb[0];
-    gabs = rgb[1] > 1 ? rgb[1] / 255: rgb[1];
-    babs = rgb[2] > 1 ? rgb[2] / 255: rgb[2];
-    v = Math.max(rabs, gabs, babs);
+    const rabs = rgb[0] > 1 ? rgb[0] / 255: rgb[0];
+    const gabs = rgb[1] > 1 ? rgb[1] / 255: rgb[1];
+    const babs = rgb[2] > 1 ? rgb[2] / 255: rgb[2];
+    const v = Math.max(rabs, gabs, babs);
     const diff = v - Math.min(rabs, gabs, babs);
     const diffc = (c:number) => (v - c) / 6 / diff + 1 / 2;
     const percentRoundFn = (num:number) => Math.round(num * 100) / 100;
@@ -71,18 +67,3 @@ export function rgbToHsv(rgb:number[]) {
         v: percentRoundFn(v * 100)
     };
 }
-
-export function debounce(func:Function, wait:number, immediate?:boolean) {
-    let timeout:NodeJS.Timeout|null;
-    return function (this:any) {
-        const context = this, args = arguments;
-        const later = function () {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        const callNow = immediate && !timeout;
-        clearTimeout(timeout as NodeJS.Timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-};
