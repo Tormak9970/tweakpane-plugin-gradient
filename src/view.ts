@@ -161,7 +161,9 @@ export class PluginView implements View {
 	}
 
 	getCanvasTexture() {
-		return this._canvas.toDataURL();
+		const ctx = <CanvasRenderingContext2D>this._canvas.getContext("2d");
+
+		return ctx.getImageData(0, 0, 150, 20);
 	}
 
 	getColorAtPoint(pos:number) {

@@ -69,7 +69,7 @@ export const GradientGeneratorPlugin: InputBindingPlugin<
 						{ color: '#000000', stop: 0.0 },
 						{ color: '#ffffff', stop: 1.0 },
 					],
-					'getGradient': () => { return "tmp"; }
+					'getGradient': () => { return new ImageData(0, 0); }
 				};
 			};
 		},
