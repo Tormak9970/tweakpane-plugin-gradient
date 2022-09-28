@@ -12,7 +12,7 @@ Gradient Generator input binding for [Tweakpane][tweakpane].
 <script src="tormak-tweakpane-plugin-gradient.min.js"></script>
 <script>
   const pane = new Tweakpane.Pane();
-  pane.registerPlugin(TweakpaneGradientPlugin);
+  pane.registerPlugin(GradientGeneratorPlugin);
 </script>
 ```
 
@@ -20,16 +20,16 @@ Gradient Generator input binding for [Tweakpane][tweakpane].
 ### Package
 ```js
 import {Pane} from 'tweakpane';
-import * as TweakpaneGradientPlugin from '@tormak/tweakpane-plugin-gradient';
+import * as GradientGeneratorPlugin from '@tormak/tweakpane-plugin-gradient';
 
 const pane = new Pane();
-pane.registerPlugin(TweakpaneGradientPlugin);
+pane.registerPlugin(GradientGeneratorPlugin);
 ```
 
 
 ## Usage
 ```js
-pane.registerPlugin(TweakpaneGradientPlugin);
+pane.registerPlugin(GradientGeneratorPlugin);
 
 const params = {
   'Gradient': {
@@ -42,7 +42,7 @@ const params = {
 
 pane.addInput(params, 'Gradient', {
 	'view': 'gradient',
-  'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.RGB
+  'colorSpace': GradientGeneratorPlugin.COLOR_SPACES.RGB
 }).on('change', (ev) => {
   console.log(ev.value.getGradient());
 });

@@ -34,10 +34,10 @@
 		};
 
 		// Register plugin
-		pane.registerPlugin(TweakpaneGradientPlugin);
+		pane.registerPlugin(GradientGeneratorPlugin);
 		propsFolder.addInput(params, 'Gradient', {
 			'view': 'gradient',
-			'colorSpace': TweakpaneGradientPlugin.COLOR_SPACES.HEX
+			'colorSpace': GradientGeneratorPlugin.COLOR_SPACES.HEX
 		}).on('change', (ev) => {
 			console.log(ev.value.getGradient());
 		});
