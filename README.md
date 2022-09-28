@@ -5,10 +5,11 @@ Gradient Generator input binding for [Tweakpane][tweakpane].
 ## Installation
 
 
+
 ### Browser
 ```html
 <script src="tweakpane.min.js"></script>
-<script src="tweakpane-plugin-gradient.min.js"></script>
+<script src="tormak-tweakpane-plugin-gradient.min.js"></script>
 <script>
   const pane = new Tweakpane.Pane();
   pane.registerPlugin(TweakpaneGradientPlugin);
@@ -19,7 +20,7 @@ Gradient Generator input binding for [Tweakpane][tweakpane].
 ### Package
 ```js
 import {Pane} from 'tweakpane';
-import * as TweakpaneGradientPlugin from 'tweakpane-plugin-gradient';
+import * as TweakpaneGradientPlugin from '@tormak/tweakpane-plugin-gradient';
 
 const pane = new Pane();
 pane.registerPlugin(TweakpaneGradientPlugin);
